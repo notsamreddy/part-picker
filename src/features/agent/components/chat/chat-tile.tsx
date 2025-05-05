@@ -47,7 +47,6 @@ export const ChatTile = ({ messages, accentColor, onSend }: ChatTileProps) => {
                 name={message.name}
                 message={message.message}
                 isSelf={message.isSelf}
-                accentColor={accentColor}
               />
             );
           })}

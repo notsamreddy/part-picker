@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { X, Mic } from "lucide-react";
+import { X, Mic, MicOff, Video, VideoOff } from "lucide-react";
 import { useState, useEffect } from "react";
 import { TranscriptionTile } from "./transcription-tile";
 import { useVoiceAssistant } from "@livekit/components-react";
@@ -18,6 +18,7 @@ interface ChatPanelProps {
 
 export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
   const [isMuted, setIsMuted] = useState(true);
+  const [isVideoEnabled, setIsVideoEnabled] = useState(false);
   const voiceAssistant = useVoiceAssistant();
   const { config } = useConfig();
   const room = useRoomContext();
@@ -27,7 +28,9 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
   useEffect(() => {
     if (localParticipant) {
       localParticipant.setMicrophoneEnabled(false);
+      localParticipant.setCameraEnabled(false);
       setIsMuted(true);
+      setIsVideoEnabled(false);
     }
   }, [localParticipant]);
 
@@ -35,6 +38,7 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
     if (localParticipant) {
       const handleTrackEnabled = () => {
         setIsMuted(!localParticipant.isMicrophoneEnabled);
+        setIsVideoEnabled(localParticipant.isCameraEnabled);
       };
 
       localParticipant.on("trackPublished", handleTrackEnabled);
@@ -100,6 +104,19 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
     }
   };
 
+  const handleVideoToggle = async () => {
+    if (localParticipant) {
+      try {
+        const newState = !localParticipant.isCameraEnabled;
+        await localParticipant.setCameraEnabled(newState);
+        setIsVideoEnabled(newState);
+      } catch (error) {
+        console.error("Failed to toggle camera:", error);
+        toast.error("Failed to toggle camera");
+      }
+    }
+  };
+
   return (
     <div className="fixed inset-0 bg-black/20 z-50 flex items-end justify-end p-4 md:p-6">
       <Card className="w-full max-w-md h-[500px] flex flex-col animate-in slide-in-from-bottom duration-300">
@@ -147,13 +164,36 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
             >
               {isMuted ? (
                 <div className="flex items-center">
-                  <Mic className="h-4 w-4 mr-1 text-red-500" />
+                  <MicOff className="h-4 w-4 mr-1 text-red-500" />
                   <span>Unmute</span>
                 </div>
               ) : (
                 <div className="flex items-center">
                   <Mic className="h-4 w-4 mr-1" />
                   <span>Mute</span>
+                </div>
+              )}
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleVideoToggle}
+              className={
+                !isVideoEnabled
+                  ? "bg-red-100 text-red-700 border-red-200 hover:bg-red-200 hover:text-red-800"
+                  : ""
+              }
+              aria-label={isVideoEnabled ? "Disable video" : "Enable video"}
+            >
+              {!isVideoEnabled ? (
+                <div className="flex items-center">
+                  <VideoOff className="h-4 w-4 mr-1 text-red-500" />
+                  <span>Start Video</span>
+                </div>
+              ) : (
+                <div className="flex items-center">
+                  <Video className="h-4 w-4 mr-1" />
+                  <span>Stop Video</span>
                 </div>
               )}
             </Button>
