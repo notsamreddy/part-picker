@@ -3,8 +3,6 @@ import { handle } from "hono/vercel";
 
 import token from "./token";
 
-export const runtime = "edge";
-
 const app = new Hono().basePath("/api");
 
 const routes = app.route("/token", token);
