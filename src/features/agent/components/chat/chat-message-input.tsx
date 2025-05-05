@@ -1,5 +1,4 @@
-import { useWindowResize } from "@/features/agent/hooks/useWindowResize";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { SendIcon } from "lucide-react";
@@ -18,8 +17,8 @@ export const ChatMessageInput = ({
   onSend,
 }: ChatMessageInput) => {
   const [message, setMessage] = useState("");
-  const [isTyping, setIsTyping] = useState(false);
-  const [inputHasFocus, setInputHasFocus] = useState(false);
+  const [_isTyping, setIsTyping] = useState(false);
+  const [_inputHasFocus, setInputHasFocus] = useState(false);
 
   const handleSend = useCallback(() => {
     if (!onSend) {
