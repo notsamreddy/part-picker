@@ -49,7 +49,7 @@ export function ChatWidget() {
           <div className="w-24 h-24 rounded-full border-2 border-[color:var(--primary)] flex items-center justify-center">
             {/* Audio visualization placeholder */}
             <svg width="40" height="40" viewBox="0 0 40 40">
-              <recthO height="10" rx="1.5" fill="var(--primary)" />
+              <rect height="10" rx="1.5" fill="var(--primary)" />
               <rect
                 x="16"
                 y="15"
