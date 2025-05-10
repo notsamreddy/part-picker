@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useQuery } from "convex/react";
+import { useRouter } from "next/navigation";
 import { api } from "@/convex/_generated/api";
 import { SelectField } from "@/components/select-field";
 import {
@@ -16,6 +17,7 @@ interface ContentProps {
 }
 
 export function Content({ onSelectPart }: ContentProps) {
+  const router = useRouter();
   const [year, setYear] = useState<number | null>(null);
   const [manufacturer, setManufacturer] = useState<string | null>(null);
   const [model, setModel] = useState<string | null>(null);
@@ -96,8 +98,11 @@ export function Content({ onSelectPart }: ContentProps) {
             <div className="grid gap-4">
               {parts.map((p) => (
                 <button
-                  key={p.id}
-                  onClick={() => onSelectPart(p.id)}
+                  key={p._id}
+                  onClick={() => {
+                    onSelectPart(p._id);
+                    router.push(`/parts/${p.name}`);
+                  }}
                   className={cn(
                     "text-left border rounded-lg p-4",
                     "hover:bg-slate-50 transition-colors duration-200",

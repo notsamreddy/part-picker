@@ -5,11 +5,16 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { X, Mic, MicOff, Video, VideoOff } from "lucide-react";
 import { useState, useEffect } from "react";
 import { TranscriptionTile } from "./transcription-tile";
-import { useVoiceAssistant } from "@livekit/components-react";
+import {
+  useVoiceAssistant,
+  useTracks,
+  VideoTrack,
+} from "@livekit/components-react";
 import { useConfig } from "@/features/agent/hooks/useConfig";
 import { useRoomContext, useLocalParticipant } from "@livekit/components-react";
 import { useConnection } from "@/features/agent/hooks/useConnection";
 import { toast } from "sonner";
+import { Track, LocalParticipant } from "livekit-client";
 
 interface ChatPanelProps {
   isOpen: boolean;
@@ -24,6 +29,14 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
   const room = useRoomContext();
   const { connect, disconnect, shouldConnect, mode } = useConnection();
   const { localParticipant } = useLocalParticipant();
+  const tracks = useTracks();
+
+  const localTracks = tracks.filter(
+    ({ participant }) => participant instanceof LocalParticipant
+  );
+  const localCameraTrack = localTracks.find(
+    ({ source }) => source === Track.Source.Camera
+  );
 
   useEffect(() => {
     if (localParticipant) {
@@ -200,6 +213,14 @@ export function ChatPanel({ isOpen, onClose }: ChatPanelProps) {
           </div>
         </CardHeader>
         <CardContent className="flex-1 overflow-y-auto p-4">
+          {isVideoEnabled && localCameraTrack && (
+            <div className="relative w-full h-48 mb-4 rounded-lg overflow-hidden border border-gray-200">
+              <VideoTrack
+                className="absolute inset-0 w-full h-full object-cover"
+                trackRef={localCameraTrack}
+              />
+            </div>
+          )}
           {voiceAssistant.agent && (
             <TranscriptionTile
               agentAudioTrack={voiceAssistant.audioTrack}
